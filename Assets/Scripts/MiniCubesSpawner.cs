@@ -1,39 +1,57 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(MiniCubesSpawnChecker))]
+[RequireComponent(typeof(AudioSource))]
 public class MiniCubesSpawner : MonoBehaviour
 {
     private const int MinCount = 2;
     private const int MaxCount = 4;
     private const int ScaleFactor = 2;
 
-    [SerializeField] private ExplosiveCube _prefab;
+    [SerializeField] private Cube _prefab;
     [SerializeField] private Transform _container;
+    [SerializeField] private List<Explosion> _explosions;
 
-    private int _minRangeToMiniCubes = 1;
-    private int _maxRangeToMiniCubes = 101;
-    private int _currentMaxChance = 100;
-    private int _chanceFactor = 2;
+    private MiniCubesSpawnChecker _spawnChecker;
+    private AudioSource _source;
 
-    public void Spawn(Transform transform)
+    private void Awake()
     {
-        int chance = UnityEngine.Random.Range(_minRangeToMiniCubes, _maxRangeToMiniCubes);
+        _spawnChecker = GetComponent<MiniCubesSpawnChecker>();
+        _source = GetComponent<AudioSource>();
+    }
 
-        if (chance > _currentMaxChance)
+    private void OnEnable()
+    {
+        foreach (Explosion explosion in _explosions)
         {
-            return;
+            explosion.SetParameters(_spawnChecker, _source);
+            explosion.MiniCubesSpawned += Spawn;
         }
+    }
 
-        _currentMaxChance /= _chanceFactor;
+    private void OnDisable()
+    {
+        foreach (Explosion explosion in _explosions)
+        {
+            explosion.MiniCubesSpawned -= Spawn;
+        }
+    }
 
-        int count = UnityEngine.Random.Range(MinCount, MaxCount);
+    private void Spawn(Transform transform)
+    {
+        int count = Random.Range(MinCount, MaxCount);
 
         for (int i = 0; i < count; i++)
         {
-            ExplosiveCube newCube = Instantiate(_prefab, _container);
+            Cube newCube = Instantiate(_prefab, _container);
             newCube.transform.position = transform.position;
             newCube.transform.localScale = transform.localScale;
             newCube.transform.localScale /= ScaleFactor;
+            newCube.Explosion.SetParameters(_spawnChecker, _source);
+            newCube.Explosion.MiniCubesSpawned += Spawn;
+            _explosions.Add(newCube.Explosion);
         }
     }
 }
