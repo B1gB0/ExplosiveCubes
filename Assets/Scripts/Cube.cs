@@ -10,7 +10,6 @@ public class Cube : MonoBehaviour
     private void Awake()
     {
         _explosion = GetComponent<Explosion>();
-
         gameObject.GetComponent<Renderer>().material.color =
         new Color(Random.value, Random.value, Random.value, 1f);
     }

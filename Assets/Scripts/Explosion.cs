@@ -29,7 +29,7 @@ public class Explosion : MonoBehaviour
     {
         _source.Play();
 
-        if (_spawnChecker.IsSpawn())
+        if (_spawnChecker.GetChanceToSpawn())
             MiniCubesSpawned?.Invoke(transform);
 
         foreach (Rigidbody explodableObject in GetExplodableObjects())

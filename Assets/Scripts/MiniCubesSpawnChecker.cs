@@ -7,7 +7,7 @@ public class MiniCubesSpawnChecker : MonoBehaviour
     private int _currentMaxChance = 100;
     private int _chanceFactor = 2;
 
-    public bool IsSpawn()
+    public bool GetChanceToSpawn()
     {
         int chance = Random.Range(_minRangeToMiniCubes, _maxRangeToMiniCubes);
 
